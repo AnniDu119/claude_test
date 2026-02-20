@@ -1,0 +1,23 @@
+[
+  {
+    "output": "# One-Day Meal Plan for Marathon Preparation\n\nHere is a one-day meal plan for an athlete preparing for marathon competition with optimal energy for long-distance endurance training:\n\n* **Calorie Target:** Approximately 3,100 calories\n* **Macronutrient Breakdown:** Protein (115g), Fat (85g), Carbs (420g)\n\n## Meal Plan:\n\n* **Breakfast (7:00 AM):** Oatmeal (100g dry weight) with banana (120g), honey (20g), and almond butter (25g). Orange juice (240ml).\n  * Protein: 12g, Fat: 10g, Carbs: 85g\n\n* **Mid-Morning Snack (10:00 AM):** Energy bar (50g) and dates (60g).\n  * Protein: 6g, Fat: 8g, Carbs: 55g\n\n* **Lunch (1:00 PM):** Grilled turkey breast (140g) sandwich on whole wheat bread (80g) with lettuce (30g), tomato (40g), and olive oil spread (15g). Mixed fruit salad with berries (150g).\n  * Protein: 38g, Fat: 15g, Carbs: 75g\n\n* **Pre-Training Snack (3:30 PM):** White rice cakes (40g) with honey (15g) and coconut oil (10g). Sports drink (500ml).\n  * Protein: 3g, Fat: 10g, Carbs: 70g\n\n* **Dinner (7:00 PM):** Grilled chicken breast (150g) with sweet potato (200g), roasted asparagus (150g), and olive oil (15g).\n  * Protein: 42g, Fat: 20g, Carbs: 65g\n\n* **Evening Snack (9:30 PM):** Rice cakes (30g) with sunflower seed butter (20g) and sliced apple (100g).\n  * Protein: 8g, Fat: 12g, Carbs: 45g\n\nThis meal plan prioritizes complex carbohydrates and lean proteins to fuel long-distance training, while avoiding all dairy products. The timing and composition support sustained energy, muscle recovery, and marathon endurance goals.",
+    "test_case": {
+      "prompt_inputs": {
+        "height": "178",
+        "weight": "68",
+        "goal": "Marathon preparation with optimal energy for long-distance endurance training",
+        "restrictions": "Lactose intolerant"
+      },
+      "solution_criteria": [
+        "Meal plan covers full day with breakfast, lunch, dinner, and snacks",
+        "Macronutrient composition prioritizes high carbohydrates (55-65%) and moderate protein (15-20%) suitable for marathon training",
+        "All meals and snacks are lactose-free or use lactose-free alternatives",
+        "Plan is concise and practical (fits within 1 day format without excessive detail)"
+      ],
+      "task_description": "Write a compact, concise 1 day meal plan for a single athlete",
+      "scenario": "Testing with a professional endurance athlete (marathon runner) who has specific macronutrient requirements (high carbs, moderate protein) and dietary restrictions (lactose intolerant), requiring the meal plan to balance performance nutrition with digestive comfort"
+    },
+    "score": 8,
+    "reasoning": "The solution fully satisfies all mandatory requirements with clear daily totals, detailed macronutrient breakdowns, and six meals with exact portions and timing. The plan is appropriately lactose-free and concise. Secondary criteria are largely met: the meal plan covers the full day with proper meal distribution, and macronutrient composition is reasonably aligned with marathon training needs, though fat percentage is slightly elevated. The main deficiency is that caloric targets don't appear personalized to the athlete's relatively lean physique, and hydration strategy is absent. These are minor issues that don't prevent the solution from meeting stated criteria."
+  }
+]
