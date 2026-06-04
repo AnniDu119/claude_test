@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>🚀 Word Quest!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c-rose:   #fda4af;
+    --c-amber:  #fcd34d;
+    --c-mint:   #6ee7b7;
+    --c-sky:    #93c5fd;
+    --c-violet: #c4b5fd;
+    --c-indigo: #6366f1;
+    --c-pink:   #ec4899;
+    --c-green:  #22c55e;
+    --c-red:    #ef4444;
+    --c-text:   #1f2937;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--c-text);
+    min-height: 100vh;
+  }
+  body {
+    background: linear-gradient(135deg, #fda4af 0%, #fcd34d 30%, #6ee7b7 65%, #93c5fd 100%);
+    background-attachment: fixed;
+    padding: 20px;
+  }
+  #app {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    margin-top: 20px;
+    animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pop {
+    0%   { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+  h1 {
+    text-align: center;
+    font-size: 3rem;
+    margin: 10px 0;
+    color: #fff;
+    text-shadow: 3px 3px 0 var(--c-pink), 6px 6px 0 var(--c-indigo);
+    letter-spacing: 1px;
+  }
+  h2 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    color: var(--c-indigo);
+  }
+  .subtitle {
+    text-align: center;
+    color: #fff;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+  }
+  button {
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 18px;
+    padding: 16px 22px;
+    font-size: 1.15rem;
+    transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.15);
+  }
+  button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 0 rgba(0,0,0,0.18); }
+  button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+  button:disabled { cursor: default; opacity: 0.85; }
+  .menu-btn {
+    width: 100%;
+    margin: 12px 0;
+    font-size: 1.3rem;
+    padding: 22px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .menu-btn .icon { font-size: 2.2rem; }
+  .menu-btn .label { flex: 1; }
+  .menu-btn .sub { font-size: 0.95rem; opacity: 0.92; display: block; font-weight: 500; }
+  .btn-new  { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  .btn-mist { background: linear-gradient(135deg, #ec4899, #db2777); }
+  .btn-mix  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .btn-repo { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+
+  .stats-bar {
+    display: flex;
+    justify-content: space-around;
+    background: #fef3c7;
+    border-radius: 20px;
+    padding: 14px;
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+  .stat { text-align: center; }
+  .stat .num { font-size: 1.6rem; color: var(--c-indigo); display: block; }
+  .stat .lbl { font-size: 0.85rem; color: #64748b; }
+
+  .progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .progress .dot {
+    flex: 1; height: 12px; border-radius: 6px;
+    background: #e5e7eb;
+  }
+  .progress .dot.done.right { background: var(--c-green); }
+  .progress .dot.done.wrong { background: var(--c-red); }
+  .progress .dot.current { background: var(--c-amber); }
+
+  .qtype {
+    text-align: center;
+    color: var(--c-pink);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .question {
+    font-size: 1.6rem;
+    text-align: center;
+    line-height: 1.4;
+    margin: 16px 0 28px;
+  }
+  .question .target {
+    color: var(--c-indigo);
+    background: #eef2ff;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+  .question .blank {
+    display: inline-block;
+    background: #fef3c7;
+    color: #b45309;
+    padding: 4px 18px;
+    border-radius: 10px;
+    border-bottom: 3px dashed #b45309;
+    font-weight: 700;
+    min-width: 80px;
+  }
+
+  .choices { display: grid; gap: 12px; }
+  .choice {
+    text-align: left;
+    color: #fff;
+    font-size: 1.15rem;
+    padding: 18px 22px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .choice .marker {
+    background: rgba(255,255,255,0.3);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .choice .text { flex: 1; }
+  .choice.c1 { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+  .choice.c2 { background: linear-gradient(135deg, #f472b6, #db2777); }
+  .choice.c3 { background: linear-gradient(135deg, #fbbf24, #d97706); }
+  .choice.c4 { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+  .choice.correct { background: linear-gradient(135deg, #34d399, #059669) !important; animation: shake-good 0.5s; }
+  .choice.wrong   { background: linear-gradient(135deg, #f87171, #dc2626) !important; animation: shake-bad 0.5s; }
+  @keyframes shake-good { 0%,100%{ transform: none } 25%{ transform: scale(1.04) } 75%{ transform: scale(0.98) } }
+  @keyframes shake-bad  { 0%,100%{ transform: none } 25%{ transform: translateX(-6px) } 75%{ transform: translateX(6px) } }
+
+  .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tf-yes { background: linear-gradient(135deg, #34d399, #059669); color: #fff; font-size: 1.4rem; padding: 22px; border-radius: 18px; }
+  .tf-no  { background: linear-gradient(135deg, #f87171, #dc2626); color: #fff; font-size: 1.4rem; padding: 22px; border-radius: 18px; }
+
+  .feedback {
+    margin-top: 22px;
+    padding: 20px;
+    border-radius: 18px;
+    background: #f0fdf4;
+    border: 3px dashed var(--c-green);
+    animation: pop 0.3s;
+  }
+  .feedback.bad { background: #fef2f2; border-color: var(--c-red); }
+  .feedback .big { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
+  .feedback .ok  { color: var(--c-green); }
+  .feedback .no  { color: var(--c-red); }
+  .feedback .word-info { margin-top: 10px; font-size: 1.05rem; line-height: 1.5; }
+  .feedback .word-info strong { color: var(--c-indigo); }
+  .feedback .ex { font-style: italic; color: #475569; margin-top: 6px; }
+
+  .next-btn {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    width: 100%;
+    margin-top: 18px;
+    font-size: 1.25rem;
+  }
+  .ghost-btn {
+    background: #fff;
+    color: var(--c-indigo);
+    border: 3px solid var(--c-indigo);
+    box-shadow: 0 5px 0 var(--c-indigo);
+  }
+  .ghost-btn:hover:not(:disabled) { box-shadow: 0 7px 0 var(--c-indigo); }
+  .ghost-btn:active:not(:disabled) { box-shadow: 0 2px 0 var(--c-indigo); }
+
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .home-link {
+    background: none;
+    color: var(--c-indigo);
+    box-shadow: none;
+    padding: 6px 10px;
+    font-size: 1rem;
+  }
+  .home-link:hover:not(:disabled) { transform: none; box-shadow: none; text-decoration: underline; }
+  .streak {
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .repo-empty {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.2rem;
+    color: #6b7280;
+  }
+  .repo-list { display: grid; gap: 12px; }
+  .repo-item {
+    background: #f8fafc;
+    border-left: 6px solid var(--c-pink);
+    padding: 14px 18px;
+    border-radius: 14px;
+  }
+  .repo-item .head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; margin-bottom: 6px;
+  }
+  .repo-item .word { font-size: 1.4rem; font-weight: 700; color: var(--c-indigo); }
+  .repo-item .count {
+    background: var(--c-red); color: #fff;
+    padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+  }
+  .repo-item .def { font-size: 1.05rem; margin: 4px 0; }
+  .repo-item .ex { font-style: italic; color: #475569; font-size: 0.98rem; }
+
+  /* Repository folders */
+  .folder-list { display: grid; gap: 14px; margin-top: 12px; }
+  .folder-card {
+    display: flex; align-items: center; gap: 14px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 16px 18px;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.08);
+    border: 3px solid transparent;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+  }
+  .folder-card:hover { transform: translateY(-2px); box-shadow: 0 8px 0 rgba(0,0,0,0.12); }
+  .folder-card .icon  { font-size: 2.4rem; flex-shrink: 0; }
+  .folder-card .meta  { flex: 1; min-width: 0; }
+  .folder-card .ftitle { font-size: 1.2rem; font-weight: 700; color: var(--c-text); }
+  .folder-card .ftagline { font-size: 0.9rem; color: #6b7280; }
+  .folder-card .fcount {
+    background: #eef2ff; color: var(--c-indigo);
+    padding: 6px 14px; border-radius: 999px;
+    font-weight: 700; font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .folder-card .actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .folder-card button {
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+    color: #fff;
+  }
+  .folder-card .view-btn     { background: linear-gradient(135deg, #94a3b8, #64748b); }
+  .folder-card .practice-btn { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  .folder-card[data-key="seen"]      { border-left: 8px solid #6366f1; }
+  .folder-card[data-key="miss1"]     { border-left: 8px solid #22c55e; }
+  .folder-card[data-key="miss2"]     { border-left: 8px solid #fbbf24; }
+  .folder-card[data-key="miss3"]     { border-left: 8px solid #f97316; }
+  .folder-card[data-key="miss4plus"] { border-left: 8px solid #ef4444; }
+  .folder-card.empty { opacity: 0.55; }
+  .folder-card.empty button[disabled] { cursor: not-allowed; }
+
+  @media (max-width: 600px) {
+    .folder-card { flex-wrap: wrap; }
+    .folder-card .actions { width: 100%; justify-content: flex-end; }
+  }
+
+  .summary-emoji { font-size: 4rem; text-align: center; margin: 10px 0; }
+  .summary-score { text-align: center; font-size: 1.6rem; font-weight: 700; color: var(--c-indigo); }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .danger-btn { background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; }
+
+  /* User picker */
+  .user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .user-card {
+    background: linear-gradient(135deg, #fef9c3, #fde68a);
+    border: 3px solid transparent;
+    border-radius: 20px;
+    padding: 18px 14px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.12);
+  }
+  .user-card:hover { transform: translateY(-3px); border-color: var(--c-indigo); box-shadow: 0 8px 0 rgba(0,0,0,0.15); }
+  .user-card .avatar { font-size: 3rem; line-height: 1; }
+  .user-card .name { font-size: 1.2rem; font-weight: 700; margin-top: 8px; color: var(--c-text); word-break: break-word; }
+  .user-card .stats { font-size: 0.85rem; color: #6b7280; margin-top: 4px; }
+  .user-card .del {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(239, 68, 68, 0.85);
+    color: #fff;
+    border: none;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: none;
+    padding: 0;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .user-card:hover .del { opacity: 1; }
+  .user-card.add {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    border: 3px dashed var(--c-indigo);
+  }
+  .user-card.add .avatar { color: var(--c-indigo); }
+
+  .avatar-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin: 14px 0 20px;
+  }
+  .avatar-pick {
+    font-size: 2rem;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: 3px solid transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.1s, border-color 0.1s;
+    box-shadow: none;
+    padding: 0;
+  }
+  .avatar-pick:hover { transform: scale(1.1); }
+  .avatar-pick.selected { border-color: var(--c-indigo); background: #eef2ff; transform: scale(1.1); }
+
+  .name-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1.4rem;
+    padding: 14px 18px;
+    border: 3px solid var(--c-violet);
+    border-radius: 16px;
+    text-align: center;
+    outline: none;
+    font-weight: 600;
+  }
+  .name-input:focus { border-color: var(--c-indigo); }
+
+  .user-banner {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff;
+    color: var(--c-indigo);
+    padding: 8px 14px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-weight: 600;
+    width: fit-content;
+    margin: 0 auto 12px;
+    cursor: pointer;
+  }
+  .user-banner .avatar { font-size: 1.5rem; }
+  .user-banner .switch { font-size: 0.85rem; color: #6b7280; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 2.2rem; }
+    .card { padding: 22px; border-radius: 22px; }
+    .question { font-size: 1.3rem; }
+    .choice { font-size: 1.05rem; padding: 14px 16px; }
+    .tf-yes, .tf-no { font-size: 1.2rem; padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="words.js"></script>
+<script>
+"use strict";
+
+const LEGACY_STORE_KEY = "wordQuestData_v1";
+const USERS_KEY = "wordQuest_users_v1";
+const DATA_PREFIX = "wordQuest_data_v1__";
+const ROUND_SIZE = 5;
+const AVATAR_CHOICES = ["🦄","🐱","🐶","🦊","🐼","🐧","🐯","🐸","🦖","🚀","⚡","🌟","🌈","🎨","🍀","🦋"];
+
+// ---------- User management ----------
+function loadUsers() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    if (!raw) return { active: null, list: [] };
+    const u = JSON.parse(raw);
+    return { active: u.active || null, list: Array.isArray(u.list) ? u.list : [] };
+  } catch (e) {
+    return { active: null, list: [] };
+  }
+}
+function saveUsers(u) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(u));
+}
+function userDataKey(name) { return DATA_PREFIX + name; }
+
+// One-time migration: if old single-user data exists and no users yet, migrate it.
+function migrateLegacy(u) {
+  const legacy = localStorage.getItem(LEGACY_STORE_KEY);
+  if (legacy && u.list.length === 0) {
+    const name = "Player 1";
+    localStorage.setItem(userDataKey(name), legacy);
+    u.list.push({ name, avatar: "🌟", createdAt: Date.now() });
+    u.active = name;
+    saveUsers(u);
+    localStorage.removeItem(LEGACY_STORE_KEY);
+  }
+  return u;
+}
+
+let users = migrateLegacy(loadUsers());
+
+// ---------- Per-user store ----------
+function defaultStore() {
+  return {
+    seen: {},        // word -> last-seen timestamp
+    mistakes: {},    // word -> { count, lastWrong }
+    stats: { totalCorrect: 0, totalAnswered: 0, bestStreak: 0 },
+  };
+}
+function loadStore() {
+  if (!users.active) return defaultStore();
+  try {
+    const raw = localStorage.getItem(userDataKey(users.active));
+    if (!raw) return defaultStore();
+    return { ...defaultStore(), ...JSON.parse(raw) };
+  } catch (e) {
+    return defaultStore();
+  }
+}
+function saveStore(s) {
+  if (!users.active) return;
+  localStorage.setItem(userDataKey(users.active), JSON.stringify(s));
+}
+function getUserMeta(name) {
+  return users.list.find(u => u.name === name);
+}
+function loadStoreFor(name) {
+  try {
+    const raw = localStorage.getItem(userDataKey(name));
+    if (!raw) return defaultStore();
+    return { ...defaultStore(), ...JSON.parse(raw) };
+  } catch (e) { return defaultStore(); }
+}
+
+let store = loadStore();
+
+// ---------- Helpers ----------
+function shuffle(a) {
+  const arr = a.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function pickRandom(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+// Try to blank out the target word (any inflected form) in the example sentence.
+function blankExample(word, ex) {
+  if (!ex) return null;
+  // Match the word stem + any letter chars (handles -ing, -ed, -s, -ly, etc.)
+  const stem = word.length > 4 ? word.slice(0, word.length - 1) : word;
+  const re = new RegExp("\\b" + escapeReg(stem) + "\\w*", "i");
+  if (!re.test(ex)) {
+    // Fall back to exact word match
+    const re2 = new RegExp("\\b" + escapeReg(word) + "\\w*", "i");
+    if (!re2.test(ex)) return null;
+    return ex.replace(re2, '<span class="blank">_____</span>');
+  }
+  return ex.replace(re, '<span class="blank">_____</span>');
+}
+
+// Pick distractor words different from the answer
+function pickDistractors(answerWord, n) {
+  const pool = VOCAB.filter(v => v.word !== answerWord);
+  return pickRandom(pool, n);
+}
+
+// ---------- Word selection ----------
+function unseenWords() {
+  return VOCAB.filter(v => !store.seen[v.word]);
+}
+function mistakeWords() {
+  return VOCAB.filter(v => store.mistakes[v.word]);
+}
+// Active mistakes = words the player got wrong and hasn't yet answered right again.
+// Legacy entries (missing `active`) are treated as active.
+function activeMistakeWords() {
+  return VOCAB.filter(v => {
+    const m = store.mistakes[v.word];
+    return m && m.active !== false;
+  });
+}
+function seenWords() {
+  return VOCAB.filter(v => store.seen[v.word]);
+}
+// Bucket label for a mistake count (1, 2, 3, or 4+)
+function bucketOf(count) {
+  if (count === 1) return "miss1";
+  if (count === 2) return "miss2";
+  if (count === 3) return "miss3";
+  if (count >= 4) return "miss4plus";
+  return null;
+}
+// Folder metadata used by repository view + mode picker
+const FOLDERS = [
+  { key: "seen",      icon: "👀", title: "Words I've seen",         tagline: "All the words you've met" },
+  { key: "miss1",     icon: "1️⃣", title: "Missed 1 time",           tagline: "Almost got these — let's review" },
+  { key: "miss2",     icon: "2️⃣", title: "Missed 2 times",          tagline: "Sneaky — practice these again" },
+  { key: "miss3",     icon: "3️⃣", title: "Missed 3 times",          tagline: "Tough cookies — keep going" },
+  { key: "miss4plus", icon: "🔥", title: "Missed more than 3 times", tagline: "Boss-level words — you've got this!" },
+];
+function wordsInFolder(folderKey) {
+  if (folderKey === "seen") return seenWords();
+  return VOCAB.filter(v => {
+    const m = store.mistakes[v.word];
+    return m && bucketOf(m.count) === folderKey;
+  });
+}
+
+function pickRoundWords(mode) {
+  let pool;
+  if (mode === "new") {
+    pool = unseenWords();
+    if (pool.length < ROUND_SIZE) {
+      // Top up from least-recently-seen
+      const seen = VOCAB.filter(v => store.seen[v.word])
+        .sort((a, b) => (store.seen[a.word] || 0) - (store.seen[b.word] || 0));
+      pool = pool.concat(seen).slice(0, Math.max(ROUND_SIZE, pool.length));
+    }
+  } else if (mode === "mistakes") {
+    pool = activeMistakeWords();
+    if (pool.length === 0) return [];
+  } else if (mode === "seen" || mode === "miss1" || mode === "miss2" || mode === "miss3" || mode === "miss4plus") {
+    pool = wordsInFolder(mode);
+    if (pool.length === 0) return [];
+  } else if (mode === "mix") {
+    const m = activeMistakeWords();
+    const u = unseenWords();
+    const fromM = pickRandom(m, Math.min(2, m.length));
+    const fromU = pickRandom(u, ROUND_SIZE - fromM.length);
+    return shuffle(fromM.concat(fromU)).slice(0, ROUND_SIZE);
+  } else {
+    pool = unseenWords();
+  }
+  // If pool is smaller than a full round, sample with repetition (weighted by mistake count where applicable)
+  if (pool.length < ROUND_SIZE) {
+    const weighted = [];
+    pool.forEach(v => {
+      const w = (store.mistakes[v.word] && store.mistakes[v.word].count) || 1;
+      for (let i = 0; i < w; i++) weighted.push(v);
+    });
+    const out = [];
+    for (let i = 0; i < ROUND_SIZE; i++) {
+      out.push(weighted[Math.floor(Math.random() * weighted.length)] || pool[0]);
+    }
+    return out;
+  }
+  return pickRandom(pool, ROUND_SIZE);
+}
+
+// ---------- Question builders ----------
+// Returns: { type, prompt, choices: [{text,correct}], reveal: {word,def,ex} }
+function buildQuestion(entry) {
+  const types = ["wordToDef", "defToWord", "fillBlank", "trueFalse"];
+  // If example can't be blanked, drop fillBlank for this entry
+  const blanked = blankExample(entry.word, entry.ex);
+  const available = blanked ? types : types.filter(t => t !== "fillBlank");
+  const type = available[Math.floor(Math.random() * available.length)];
+
+  if (type === "wordToDef") {
+    const distractors = pickDistractors(entry.word, 3);
+    const choices = shuffle([
+      { text: entry.def, correct: true },
+      ...distractors.map(d => ({ text: d.def, correct: false })),
+    ]);
+    return {
+      type, label: "What does this word mean?",
+      prompt: `What does <span class="target">${escapeHtml(entry.word)}</span> mean?`,
+      choices,
+      reveal: entry,
+    };
+  }
+
+  if (type === "defToWord") {
+    const distractors = pickDistractors(entry.word, 3);
+    const choices = shuffle([
+      { text: entry.word, correct: true },
+      ...distractors.map(d => ({ text: d.word, correct: false })),
+    ]);
+    return {
+      type, label: "Pick the word that matches",
+      prompt: `Which word means: <span class="target">${escapeHtml(entry.def)}</span>?`,
+      choices,
+      reveal: entry,
+    };
+  }
+
+  if (type === "fillBlank") {
+    const distractors = pickDistractors(entry.word, 3);
+    const choices = shuffle([
+      { text: entry.word, correct: true },
+      ...distractors.map(d => ({ text: d.word, correct: false })),
+    ]);
+    return {
+      type, label: "Fill in the blank",
+      prompt: `${blanked}`,
+      choices,
+      reveal: entry,
+    };
+  }
+
+  if (type === "trueFalse") {
+    // 50/50 chance of correct pairing
+    const showCorrect = Math.random() < 0.5;
+    let shownDef;
+    if (showCorrect) {
+      shownDef = entry.def;
+    } else {
+      const other = pickDistractors(entry.word, 1)[0];
+      shownDef = other.def;
+    }
+    return {
+      type, label: "True or False?",
+      prompt: `Does <span class="target">${escapeHtml(entry.word)}</span> mean:<br><em>"${escapeHtml(shownDef)}"</em> ?`,
+      choices: [
+        { text: "✅ YES, that's right!", correct: showCorrect, _kind: "yes" },
+        { text: "❌ NO way!",            correct: !showCorrect, _kind: "no" },
+      ],
+      reveal: entry,
+    };
+  }
+}
+
+// ---------- App state ----------
+const app = document.getElementById("app");
+let state = { view: "home" };
+
+function go(view, data = {}) {
+  state = { view, ...data };
+  render();
+}
+
+// ---------- Render: PICKER ----------
+function renderPicker() {
+  const cards = users.list.map(u => {
+    const s = loadStoreFor(u.name);
+    const seen = Object.keys(s.seen).length;
+    const miss = Object.keys(s.mistakes).length;
+    return `
+      <div class="user-card" data-pick="${escapeHtml(u.name)}">
+        <button class="del" data-del="${escapeHtml(u.name)}" title="Delete player">✕</button>
+        <div class="avatar">${u.avatar || "🌟"}</div>
+        <div class="name">${escapeHtml(u.name)}</div>
+        <div class="stats">${seen} seen · ${miss} to master</div>
+      </div>
+    `;
+  }).join("");
+
+  app.innerHTML = `
+    <h1>🚀 Word Quest!</h1>
+    <p class="subtitle">Who's playing today? 👋</p>
+    <div class="card">
+      <h2>Pick your player</h2>
+      <div class="user-grid">
+        ${cards}
+        <div class="user-card add" data-add="1">
+          <div class="avatar">➕</div>
+          <div class="name">New player</div>
+          <div class="stats">Start fresh!</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  app.querySelectorAll("[data-pick]").forEach(el => {
+    el.onclick = (e) => {
+      if (e.target.closest("[data-del]")) return;
+      const name = el.dataset.pick;
+      users.active = name;
+      saveUsers(users);
+      store = loadStore();
+      renderHome();
+    };
+  });
+  app.querySelectorAll("[data-del]").forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const name = btn.dataset.del;
+      if (!confirm(`Delete player "${name}" and all their progress? This can't be undone.`)) return;
+      users.list = users.list.filter(u => u.name !== name);
+      if (users.active === name) users.active = null;
+      saveUsers(users);
+      localStorage.removeItem(userDataKey(name));
+      renderPicker();
+    };
+  });
+  const addBtn = app.querySelector("[data-add]");
+  if (addBtn) addBtn.onclick = () => renderAddUser();
+}
+
+// ---------- Render: ADD USER ----------
+function renderAddUser() {
+  let selectedAvatar = AVATAR_CHOICES[Math.floor(Math.random() * AVATAR_CHOICES.length)];
+  const draw = () => {
+    app.innerHTML = `
+      <h1>🚀 Word Quest!</h1>
+      <p class="subtitle">Let's set you up! ✨</p>
+      <div class="card">
+        <h2>What's your name?</h2>
+        <input type="text" class="name-input" id="name-in" maxlength="20" placeholder="Type your name..." autofocus>
+        <h2 style="margin-top:22px;">Pick an avatar</h2>
+        <div class="avatar-row">
+          ${AVATAR_CHOICES.map(a => `
+            <button class="avatar-pick ${a === selectedAvatar ? "selected" : ""}" data-av="${a}">${a}</button>
+          `).join("")}
+        </div>
+        <div class="row-2">
+          <button class="ghost-btn" id="cancel-btn">← Back</button>
+          <button class="next-btn"  id="create-btn">Let's go! 🚀</button>
+        </div>
+      </div>
+    `;
+    const input = document.getElementById("name-in");
+    input.focus();
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") document.getElementById("create-btn").click();
+    });
+    app.querySelectorAll("[data-av]").forEach(b => {
+      b.onclick = () => { selectedAvatar = b.dataset.av; draw(); };
+    });
+    document.getElementById("cancel-btn").onclick = () => {
+      if (users.list.length) renderPicker(); else renderAddUser();
+    };
+    document.getElementById("create-btn").onclick = () => {
+      const name = input.value.trim();
+      if (!name) { input.focus(); input.style.borderColor = "var(--c-red)"; return; }
+      if (users.list.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+        alert(`There's already a player called "${name}". Try a different name!`);
+        return;
+      }
+      users.list.push({ name, avatar: selectedAvatar, createdAt: Date.now() });
+      users.active = name;
+      saveUsers(users);
+      store = defaultStore();
+      saveStore(store);
+      renderHome();
+    };
+  };
+  draw();
+}
+
+// ---------- Render: HOME ----------
+function renderHome() {
+  const seenCount = Object.keys(store.seen).length;
+  const activeCount = activeMistakeWords().length;
+  const accuracy = store.stats.totalAnswered
+    ? Math.round(100 * store.stats.totalCorrect / store.stats.totalAnswered)
+    : 0;
+
+  const me = getUserMeta(users.active) || { avatar: "🌟", name: users.active || "" };
+  app.innerHTML = `
+    <h1>🚀 Word Quest!</h1>
+    <p class="subtitle">Learn 1,800 awesome words ✨</p>
+    <div class="user-banner" id="user-banner" title="Switch player">
+      <span class="avatar">${me.avatar}</span>
+      <span>Hi, ${escapeHtml(me.name)}!</span>
+      <span class="switch">(switch)</span>
+    </div>
+    <div class="card">
+      <div class="stats-bar">
+        <div class="stat"><span class="num">${seenCount}</span><span class="lbl">Words Seen</span></div>
+        <div class="stat"><span class="num">${activeCount}</span><span class="lbl">Mistake Bank</span></div>
+        <div class="stat"><span class="num">${accuracy}%</span><span class="lbl">Accuracy</span></div>
+        <div class="stat"><span class="num">${store.stats.bestStreak}🔥</span><span class="lbl">Best Streak</span></div>
+      </div>
+      <h2>Pick your adventure</h2>
+      <button class="menu-btn btn-new"  data-go="play-new">
+        <span class="icon">🌱</span>
+        <span class="label">New Words<span class="sub">${unseenWords().length} fresh words left to discover</span></span>
+      </button>
+      <button class="menu-btn btn-mist" data-go="play-mistakes">
+        <span class="icon">💪</span>
+        <span class="label">Mistake Bank<span class="sub">${activeCount} tricky word${activeCount === 1 ? "" : "s"} to crack ${activeCount === 0 ? "(empty — nice!)" : ""}</span></span>
+      </button>
+      <button class="menu-btn btn-mix"  data-go="play-mix">
+        <span class="icon">🎲</span>
+        <span class="label">Mix It Up!<span class="sub">A blend of new + tricky words</span></span>
+      </button>
+      <button class="menu-btn btn-repo" data-go="repo">
+        <span class="icon">📚</span>
+        <span class="label">My Word Repository<span class="sub">See words you missed + tips</span></span>
+      </button>
+    </div>
+  `;
+  app.querySelectorAll("[data-go]").forEach(btn => {
+    btn.onclick = () => {
+      const dest = btn.dataset.go;
+      if (dest === "play-new")      startRound("new");
+      else if (dest === "play-mistakes") {
+        if (activeMistakeWords().length === 0) {
+          alert("Your Mistake Bank is empty! 🎉 Play some New Words first.");
+          return;
+        }
+        startRound("mistakes");
+      }
+      else if (dest === "play-mix") startRound("mix");
+      else if (dest === "repo")     go("repo");
+    };
+  });
+  document.getElementById("user-banner").onclick = () => {
+    users.active = null;
+    saveUsers(users);
+    renderPicker();
+  };
+}
+
+// ---------- Render: ROUND ----------
+function startRound(mode) {
+  const words = pickRoundWords(mode);
+  if (!words.length) { renderHome(); return; }
+  const questions = words.map(buildQuestion);
+  go("quiz", {
+    mode, questions, idx: 0,
+    results: [], streak: 0, roundStreak: 0,
+    answered: false,
+  });
+}
+
+function renderQuiz() {
+  const q = state.questions[state.idx];
+  const progressDots = state.questions.map((_, i) => {
+    if (i < state.idx) {
+      const r = state.results[i];
+      return `<div class="dot done ${r ? "right" : "wrong"}"></div>`;
+    }
+    if (i === state.idx) return `<div class="dot current"></div>`;
+    return `<div class="dot"></div>`;
+  }).join("");
+
+  const isTF = q.type === "trueFalse";
+  const choicesHtml = isTF
+    ? `<div class="tf-row">
+        <button class="tf-yes" data-ci="0">${q.choices[0].text}</button>
+        <button class="tf-no"  data-ci="1">${q.choices[1].text}</button>
+       </div>`
+    : `<div class="choices">
+        ${q.choices.map((c, i) => `
+          <button class="choice c${i+1}" data-ci="${i}">
+            <span class="marker">${String.fromCharCode(65+i)}</span>
+            <span class="text">${escapeHtml(c.text)}</span>
+          </button>
+        `).join("")}
+       </div>`;
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="top-row">
+        <button class="home-link" id="home-link">🏠 Home</button>
+        <div class="streak">🔥 Streak ${state.roundStreak}</div>
+      </div>
+      <div class="progress">${progressDots}</div>
+      <div class="qtype">${q.label}</div>
+      <div class="question">${q.prompt}</div>
+      ${choicesHtml}
+      <div id="fb"></div>
+    </div>
+  `;
+
+  document.getElementById("home-link").onclick = () => {
+    if (confirm("Quit this round and go home?")) renderHome();
+  };
+
+  app.querySelectorAll("[data-ci]").forEach(btn => {
+    btn.onclick = () => onAnswer(parseInt(btn.dataset.ci, 10), btn);
+  });
+}
+
+function onAnswer(choiceIdx, btn) {
+  if (state.answered) return;
+  state.answered = true;
+  const q = state.questions[state.idx];
+  const pick = q.choices[choiceIdx];
+  const correct = !!pick.correct;
+  const word = q.reveal.word;
+
+  // Update stats
+  store.seen[word] = Date.now();
+  store.stats.totalAnswered++;
+  if (correct) {
+    store.stats.totalCorrect++;
+    state.roundStreak++;
+    if (state.roundStreak > store.stats.bestStreak) {
+      store.stats.bestStreak = state.roundStreak;
+    }
+    // Cumulative count stays (used by the Repository folders).
+    // But mark as no longer active in the Mistake Bank.
+    if (store.mistakes[word]) store.mistakes[word].active = false;
+  } else {
+    state.roundStreak = 0;
+    if (!store.mistakes[word]) store.mistakes[word] = { count: 0, lastWrong: 0, active: true };
+    store.mistakes[word].count++;
+    store.mistakes[word].lastWrong = Date.now();
+    store.mistakes[word].active = true;
+  }
+  state.results.push(correct);
+  saveStore(store);
+
+  // Highlight buttons
+  const allBtns = app.querySelectorAll("[data-ci]");
+  allBtns.forEach((b, i) => {
+    b.disabled = true;
+    if (q.choices[i].correct) b.classList.add("correct");
+    else if (i === choiceIdx) b.classList.add("wrong");
+  });
+
+  // Feedback panel
+  const cheers = ["Awesome! 🌟", "You got it! 🎉", "Nailed it! 🚀", "Boom! 💥", "Yes! 🥳", "Brilliant! ✨"];
+  const oops   = ["Oops! 🙈", "Not quite 💭", "Almost! 🤔", "Tricky one 🌀"];
+  const headline = correct
+    ? `<div class="big ok">${cheers[Math.floor(Math.random()*cheers.length)]}</div>`
+    : `<div class="big no">${oops[Math.floor(Math.random()*oops.length)]}</div>`;
+
+  const fb = document.getElementById("fb");
+  fb.innerHTML = `
+    <div class="feedback ${correct ? "" : "bad"}">
+      ${headline}
+      <div class="word-info">
+        <strong>${escapeHtml(q.reveal.word)}</strong> — ${escapeHtml(q.reveal.def)}
+        ${q.reveal.ex ? `<div class="ex">"${escapeHtml(q.reveal.ex)}"</div>` : ""}
+      </div>
+      <button class="next-btn" id="next-btn">
+        ${state.idx + 1 < state.questions.length ? "Next ➡️" : "See my score 🏆"}
+      </button>
+    </div>
+  `;
+  document.getElementById("next-btn").onclick = () => {
+    state.idx++;
+    state.answered = false;
+    if (state.idx >= state.questions.length) renderSummary();
+    else renderQuiz();
+  };
+}
+
+// ---------- Render: SUMMARY ----------
+function renderSummary() {
+  const right = state.results.filter(Boolean).length;
+  const total = state.results.length;
+  let emoji, msg;
+  if (right === total)      { emoji = "🏆"; msg = "PERFECT! You're a word wizard!"; }
+  else if (right >= total-1){ emoji = "🌟"; msg = "Awesome job!"; }
+  else if (right >= total/2){ emoji = "💪"; msg = "Nice work — keep going!"; }
+  else                      { emoji = "🌈"; msg = "Practice makes progress!"; }
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="summary-emoji">${emoji}</div>
+      <div class="summary-score">${right} / ${total} correct</div>
+      <p style="text-align:center;font-size:1.2rem;">${msg}</p>
+      <div class="row-2">
+        <button class="ghost-btn" id="home-btn">🏠 Home</button>
+        <button class="next-btn"  id="again-btn">Play again ➡️</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("home-btn").onclick = () => renderHome();
+  document.getElementById("again-btn").onclick = () => startRound(state.mode);
+}
+
+// ---------- Render: REPO (folder list) ----------
+function renderRepo() {
+  const cards = FOLDERS.map(f => {
+    const count = wordsInFolder(f.key).length;
+    const empty = count === 0;
+    return `
+      <div class="folder-card ${empty ? "empty" : ""}" data-key="${f.key}">
+        <div class="icon">${f.icon}</div>
+        <div class="meta">
+          <div class="ftitle">${f.title}</div>
+          <div class="ftagline">${f.tagline}</div>
+        </div>
+        <div class="fcount">${count}</div>
+        <div class="actions">
+          <button class="view-btn"     data-view="${f.key}" ${empty ? "disabled" : ""}>👁 View</button>
+          <button class="practice-btn" data-play="${f.key}" ${empty ? "disabled" : ""}>▶ Practice</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="top-row">
+        <button class="home-link" id="home-link">🏠 Home</button>
+        <div></div>
+      </div>
+      <h2>📚 My Word Repository</h2>
+      <p>Pick a folder to review or practice the words inside.</p>
+      <div class="folder-list">${cards}</div>
+    </div>
+  `;
+  document.getElementById("home-link").onclick = () => renderHome();
+  app.querySelectorAll("[data-view]").forEach(b => {
+    b.onclick = () => renderRepoFolder(b.dataset.view);
+  });
+  app.querySelectorAll("[data-play]").forEach(b => {
+    b.onclick = () => {
+      const key = b.dataset.play;
+      if (wordsInFolder(key).length === 0) return;
+      startRound(key);
+    };
+  });
+}
+
+// ---------- Render: REPO folder detail ----------
+function renderRepoFolder(folderKey) {
+  const folder = FOLDERS.find(f => f.key === folderKey);
+  if (!folder) { renderRepo(); return; }
+  const items = wordsInFolder(folderKey)
+    .map(v => {
+      const m = store.mistakes[v.word];
+      return { ...v, count: m ? m.count : 0 };
+    })
+    .sort((a, b) => b.count - a.count || a.word.localeCompare(b.word));
+
+  const body = items.length === 0
+    ? `<div class="repo-empty">No words in this folder yet.</div>`
+    : `<div class="repo-list">
+        ${items.map(it => `
+          <div class="repo-item">
+            <div class="head">
+              <div class="word">${escapeHtml(it.word)}</div>
+              ${it.count > 0 ? `<div class="count">missed ${it.count}×</div>` : ""}
+            </div>
+            <div class="def">${escapeHtml(it.def)}</div>
+            ${it.ex ? `<div class="ex">"${escapeHtml(it.ex)}"</div>` : ""}
+          </div>
+        `).join("")}
+      </div>`;
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="top-row">
+        <button class="home-link" id="back-btn">← Back to folders</button>
+        <div></div>
+      </div>
+      <h2>${folder.icon} ${folder.title}</h2>
+      <p>${folder.tagline} — ${items.length} word${items.length === 1 ? "" : "s"}.</p>
+      ${items.length ? `
+        <div class="row-2" style="margin-bottom: 14px;">
+          <button class="ghost-btn" id="back-btn2">← Folders</button>
+          <button class="next-btn"  id="practice-btn">▶ Practice this folder</button>
+        </div>` : ""}
+      ${body}
+    </div>
+  `;
+  const back = () => renderRepo();
+  document.getElementById("back-btn").onclick = back;
+  if (items.length) {
+    document.getElementById("back-btn2").onclick = back;
+    document.getElementById("practice-btn").onclick = () => startRound(folderKey);
+  }
+}
+
+// ---------- Main render ----------
+function render() {
+  if      (state.view === "home")  renderHome();
+  else if (state.view === "quiz")  renderQuiz();
+  else if (state.view === "repo")  renderRepo();
+  else renderHome();
+}
+
+// ---------- Boot ----------
+function boot() {
+  if (!users.active || !getUserMeta(users.active)) {
+    users.active = null;
+    if (users.list.length === 0) renderAddUser();
+    else renderPicker();
+  } else {
+    renderHome();
+  }
+}
+boot();
+</script>
+</body>
+</html>
